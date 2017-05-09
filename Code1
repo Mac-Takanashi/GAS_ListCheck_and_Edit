@@ -1,0 +1,190 @@
+//データの取得
+function getListItemsData() {
+  var page = SitesApp.getPageByUrl("https://sites.google.com/a/tbwahakuhodo.co.jp/fy17_statuschecker/entry/joined?pli=1");
+
+  //リストの取得
+  var items = page.getListItems();
+
+  //カラムヘッダーの取得
+  var columns = page.getColumns();
+
+  //詰め込み用
+  var dataList = [];
+
+  //全部取得
+  for(var row = 0; row < items.length; row++) {
+    var item = items[row];
+
+    var data = {};
+    for(var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var columnName = columns[colIndex].getName();
+      data[columnName] = item.getValueByIndex(colIndex)
+    }
+
+    dataList.push(data);
+  }
+
+  //これで dataList[行番号][カラム名]でアクセス可能
+  //ちなみに
+  //checkboxの場合はチェックが付いていると"on" ついてないとnullになる。
+  //URLはAタグ付きで来る 非常に困る。
+  //日付は yyyy-MM-dd っぽい
+  Logger.log(dataList);
+
+
+
+  //ちなみに好み的には以下のコードで書いた方好きだけど(読まなくて良い)
+  var dataList2 = items.map(function(item){
+    return columns.reduce(function(data, column){
+      var columnName = column.getName();
+      data[columnName] = item.getValueByName(columnName);
+      return data;
+    }, {});
+
+  });
+  Logger.log(dataList2); 
+
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("人事入力");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  for (var i = 0; i < columns.length; i++){
+    //sheet.getRange(2+i,1).setValue(dataList[i]["備考"]) 
+    sheet.getRange(2+i,2).setValue(dataList[i]["TH Jno"])
+    sheet.getRange(2+i,3).setValue(dataList[i]["出社日"])
+    sheet.getRange(2+i,4).setValue(dataList[i]["ステータス"])
+    sheet.getRange(2+i,5).setValue(dataList[i]["HEN端末"])
+    sheet.getRange(2+i,6).setValue(dataList[i]["部署名"])
+    sheet.getRange(2+i,7).setValue(dataList[i]["入社日"])
+    sheet.getRange(2+i,9).setValue(dataList[i]["英字氏名"])
+    sheet.getRange(2+i,12).setValue(dataList[i]["氏名"])
+    sheet.getRange(2+i,15).setValue(dataList[i]["Q Jno"])
+    sheet.getRange(2+i,18).setValue(dataList[i]["TH Mac"])
+  }
+
+  var page = SitesApp.getPageByUrl("https://sites.google.com/a/tbwahakuhodo.co.jp/fy17_statuschecker/device_and_account/account_provision");
+
+  //リストの取得
+  var items = page.getListItems();
+
+  //カラムヘッダーの取得
+  var columns = page.getColumns();
+
+  //詰め込み用
+  var dataList = [];
+
+  //全部取得
+  for(var row = 0; row < items.length; row++) {
+    var item = items[row];
+
+    var data = {};
+    for(var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var columnName = columns[colIndex].getName();
+      data[columnName] = item.getValueByIndex(colIndex)
+    }
+
+    dataList.push(data);
+  }
+
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("IT管理（アカウント）");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  for (var i = 0; i < columns.length; i++){
+    sheet.getRange(2+i,1).setValue(dataList[i]["入社日"])
+    sheet.getRange(2+i,2).setValue(dataList[i]["出社日"]) 
+    sheet.getRange(2+i,3).setValue(dataList[i]["JNO"])
+    sheet.getRange(2+i,4).setValue(dataList[i]["氏名"])
+    sheet.getRange(2+i,5).setValue(dataList[i]["Name"])
+    sheet.getRange(2+i,6).setValue(dataList[i]["部署名"])
+    sheet.getRange(2+i,7).setValue(dataList[i]["Status"])
+  }
+  
+  var page = SitesApp.getPageByUrl("https://sites.google.com/a/tbwahakuhodo.co.jp/fy17_statuschecker/entry/out");
+
+  //リストの取得
+  var items = page.getListItems();
+
+  //カラムヘッダーの取得
+  var columns = page.getColumns();
+
+  //詰め込み用
+  var dataList = [];
+
+  //全部取得
+  for(var row = 0; row < items.length; row++) {
+    var item = items[row];
+
+    var data = {};
+    for(var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var columnName = columns[colIndex].getName();
+      data[columnName] = item.getValueByIndex(colIndex)
+    }
+
+    dataList.push(data);
+  }
+  
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("退社ステータス（人事）");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  for (var i = 0; i < columns.length; i++){
+    if(dataList[i]){
+      sheet.getRange(2+i,2).setValue(dataList[i]["TH Jno"]) 
+      sheet.getRange(2+i,3).setValue(dataList[i]["Q Jno"])
+      sheet.getRange(2+i,5).setValue(dataList[i]["氏名"])
+      sheet.getRange(2+i,6).setValue(dataList[i]["部署"])
+      sheet.getRange(2+i,7).setValue(dataList[i]["退職日"])
+      sheet.getRange(2+i,7).setValue(dataList[i]["最終出社日"])
+    }
+  }
+
+  
+  var page = SitesApp.getPageByUrl("https://sites.google.com/a/tbwahakuhodo.co.jp/fy17_statuschecker/device_and_account/out_check_account");
+
+  //リストの取得
+  var items = page.getListItems();
+
+  //カラムヘッダーの取得
+  var columns = page.getColumns();
+
+  //詰め込み用
+  var dataList = [];
+
+  //全部取得
+  for(var row = 0; row < items.length; row++) {
+    var item = items[row];
+
+    var data = {};
+    for(var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var columnName = columns[colIndex].getName();
+      data[columnName] = item.getValueByIndex(colIndex)
+    }
+
+    dataList.push(data);
+  }
+  
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("退社ステータス（IT）");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  for (var i = 0; i < columns.length; i++){
+    if(dataList[i]){
+      sheet.getRange(2+i,1).setValue(dataList[i]["Jno."])  
+      sheet.getRange(2+i,2).setValue(dataList[i]["氏名"])
+      sheet.getRange(2+i,3).setValue(dataList[i]["部署名"])
+      sheet.getRange(2+i,4).setValue(dataList[i]["退社日"])
+      sheet.getRange(2+i,5).setValue(dataList[i]["最終出社日"])
+    }
+  }  
+  
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("表紙");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+}
+
