@@ -1,0 +1,204 @@
+//データの取得
+function getListItemsData() {
+  var HRJpage = SitesApp.getPageByUrl("/fy17_statuschecker/entry/joined");
+
+  //リストの取得
+  var items = HRJpage.getListItems();
+  
+  //カラムヘッダーの取得
+  var columns = HRJpage.getColumns();
+
+  //詰め込み用
+  var HRJdataList = [];
+
+  //全部取得
+  for(var row = 0; row < items.length; row++) {
+    
+    var item = items[row];
+
+    var HRJdata = {};
+    for(var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var columnName = columns[colIndex].getName();
+      HRJdata[columnName] = item.getValueByIndex(colIndex)
+    }
+
+    HRJdataList.push(HRJdata);
+  }
+
+  //これで dataList[行番号][カラム名]でアクセス可能
+  //ちなみに
+  //checkboxの場合はチェックが付いていると"on" ついてないとnullになる。
+  //URLはAタグ付きで来る 非常に困る。
+  //日付は yyyy-MM-dd っぽい
+  Logger.log(dataList);
+
+
+
+  //ちなみに好み的には以下のコードで書いた方好きだけど(読まなくて良い)
+  var dataList2 = items.map(function(item){
+    return columns.reduce(function(HRJdata, column){
+      var columnName = column.getName();
+      HRJdata[columnName] = item.getValueByName(columnName);
+      return HRJdata;
+    }, {});
+
+  });
+  Logger.log(dataList2); 
+
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("人事入力");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  for (var i = 0; i < items.length; i++){
+    //sheet.getRange(2+i,1).setValue(dataList[i]["備考"]) 
+    sheet.getRange(2+i,2).setValue(HRJdataList[i]["TH Jno"])
+    sheet.getRange(2+i,3).setValue(HRJdataList[i]["出社日"])
+    sheet.getRange(2+i,4).setValue(HRJdataList[i]["ステータス"])
+    sheet.getRange(2+i,5).setValue(HRJdataList[i]["HEN端末"])
+    sheet.getRange(2+i,6).setValue(HRJdataList[i]["部署名"])
+    sheet.getRange(2+i,7).setValue(HRJdataList[i]["入社日"])
+    sheet.getRange(2+i,9).setValue(HRJdataList[i]["英字氏名"])
+    sheet.getRange(2+i,12).setValue(HRJdataList[i]["氏名"])
+    sheet.getRange(2+i,15).setValue(HRJdataList[i]["Q Jno"])
+    sheet.getRange(2+i,18).setValue(HRJdataList[i]["TH Mac"])
+  }
+
+  var page = SitesApp.getPageByUrl("/fy17_statuschecker/device_and_account/account_provision");
+
+  //リストの取得
+  var items = page.getListItems();
+
+  //カラムヘッダーの取得
+  var columns = page.getColumns();
+
+  //詰め込み用
+  var ITAdataList = [];
+
+  //全部取得
+  for(var row = 0; row < items.length; row++) {
+    var item = items[row];
+
+    var data = {};
+    for(var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var columnName = columns[colIndex].getName();
+      data[columnName] = item.getValueByIndex(colIndex)
+    }
+
+    ITAdataList.push(data);
+  }
+  
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("IT管理（アカウント）");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  for (var i = 0; i < items.length; i++){
+    sheet.getRange(2+i,1).setValue(ITAdataList[i]["入社日"])
+    sheet.getRange(2+i,2).setValue(ITAdataList[i]["出社日"]) 
+    sheet.getRange(2+i,3).setValue(ITAdataList[i]["JNO"])
+    sheet.getRange(2+i,4).setValue(ITAdataList[i]["氏名"])
+    sheet.getRange(2+i,5).setValue(ITAdataList[i]["Name"])
+    sheet.getRange(2+i,6).setValue(ITAdataList[i]["部署名"])
+    sheet.getRange(2+i,7).setValue(ITAdataList[i]["Status"])
+    sheet.getRange(2+i,8).setValue(ITAdataList[i]["アカウント表"])
+  }
+  
+  //この辺テスト
+  //IT側の入力データを配列で作成  
+  
+  Browser.msgBox(HRJdataList[0]["TH Jno"] + HRJdataList[0]["氏名"])
+  
+  var ITAList = [];
+  for (var i = 0; i < columns.length; i++){
+    ITAList.push(ITAdataList[i]["JNO"] + ITAdataList[i]["氏名"])
+  }
+
+  Browser.msgBox(ITAList.indexOf(HRJdataList[0]["TH Jno"] + HRJdataList[0]["氏名"]))
+  
+  var page = SitesApp.getPageByUrl("/fy17_statuschecker/entry/out");
+
+  //リストの取得
+  var items = page.getListItems();
+
+  //カラムヘッダーの取得
+  var columns = page.getColumns();
+
+  //詰め込み用
+  var dataList = [];
+
+  //全部取得
+  for(var row = 0; row < items.length; row++) {
+    var item = items[row];
+
+    var data = {};
+    for(var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var columnName = columns[colIndex].getName();
+      data[columnName] = item.getValueByIndex(colIndex)
+    }
+
+    dataList.push(data);
+  }
+  
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("退社ステータス（人事）");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  for (var i = 0; i < items.length; i++){
+    if(dataList[i]){
+      sheet.getRange(2+i,2).setValue(dataList[i]["TH Jno"]) 
+      sheet.getRange(2+i,3).setValue(dataList[i]["Q Jno"])
+      sheet.getRange(2+i,5).setValue(dataList[i]["氏名"])
+      sheet.getRange(2+i,6).setValue(dataList[i]["部署"])
+      sheet.getRange(2+i,7).setValue(dataList[i]["退職日"])
+      sheet.getRange(2+i,7).setValue(dataList[i]["最終出社日"])
+    }
+  }
+
+  
+  var page = SitesApp.getPageByUrl("/fy17_statuschecker/device_and_account/out_check_account");
+
+  //リストの取得
+  var items = page.getListItems();
+
+  //カラムヘッダーの取得
+  var columns = page.getColumns();
+
+  //詰め込み用
+  var dataList = [];
+
+  //全部取得
+  for(var row = 0; row < items.length; row++) {
+    var item = items[row];
+
+    var data = {};
+    for(var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var columnName = columns[colIndex].getName();
+      data[columnName] = item.getValueByIndex(colIndex)
+    }
+
+    dataList.push(data);
+  }
+  
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("退社ステータス（IT）");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  for (var i = 0; i < items.length; i++){
+    if(dataList[i]){
+      sheet.getRange(2+i,1).setValue(dataList[i]["Jno."])  
+      sheet.getRange(2+i,2).setValue(dataList[i]["氏名"])
+      sheet.getRange(2+i,3).setValue(dataList[i]["部署名"])
+      sheet.getRange(2+i,4).setValue(dataList[i]["退社日"])
+      sheet.getRange(2+i,5).setValue(dataList[i]["最終出社日"])
+    }
+  }  
+  
+  var objSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var objSheet = objSpreadsheet.getSheetByName("表紙");
+  SpreadsheetApp.setActiveSheet(objSheet)
+  
+}
+
